@@ -19,7 +19,7 @@ def command(*, name: str):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                    logger.exception(e)
+                logger.exception(e)
         wrapper.__name__ = name
         commands_map[name] = wrapper
         return wrapper

@@ -1,3 +1,5 @@
+import re
+
 import discord
 
 import src.config as cfg
@@ -5,11 +7,12 @@ from .log import logger
 
 client = discord.Client()
 
+discord_emote_re = re.compile(r'<:(\w+|\d+):(\d{18})>')
+
 if cfg.chat_log:
     print_chat_message = logger.info
 else:
     print_chat_message = print
-
 
 def listen_all() -> bool:
     return cfg.current_guild_id is None
@@ -20,10 +23,14 @@ def listen_guild(message: discord.Message) -> bool:
 def listen_channel(message: discord.Message) -> bool:
     return cfg.current_guild_id == message.guild.id and cfg.current_channel_id == message.channel.id
 
+def fix_discord_emotes(message: str) -> str:
+    return re.sub(discord_emote_re, r'\1', message)
+
 async def output_message(message: discord.Message):
     output = '['
     if cfg.current_guild_id is None:
         output += message.guild.name
+    message.content = fix_discord_emotes(message.content)
     print_chat_message(f'{output}#{message.channel.name}] {message.author.display_name}: {message.content}')
 
 @client.event
