@@ -1,8 +1,6 @@
 from queue import Queue
 from threading import Thread
 
-from .log import logger
-
 class Message:
 
     def __init__(self, message: str):
