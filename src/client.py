@@ -56,3 +56,4 @@ async def on_ready():
 async def on_message(message):
     if listen_all() or listen_guild(message) or listen_channel(message):
         await output_message(message)
+        await message.ack()
