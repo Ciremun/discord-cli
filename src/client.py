@@ -31,7 +31,7 @@ async def output_message(message: discord.Message):
     if cfg.current_guild_id is None:
         output += message.guild.name
     message.content = fix_discord_emotes(message.content)
-    print_chat_message(f'{output}#{message.channel.name}] {message.author.display_name}: {message.content}')
+    print_chat_message(f'{output}#{message.channel.name}] {message.author.display_name}: {message.clean_content}')
 
 @client.event
 async def on_ready():
