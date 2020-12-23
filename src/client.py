@@ -26,6 +26,13 @@ def listen_channel(message: discord.Message) -> bool:
 def fix_discord_emotes(message: str) -> str:
     return re.sub(discord_emote_re, r'\1', message)
 
+def direct_message(message: discord.Message) -> bool:
+    return isinstance(message.channel, discord.DMChannel)
+
+async def output_direct_message(message: discord.Message):
+    message.content = fix_discord_emotes(message.content)
+    print_chat_message(f'[*PM] {message.author.display_name}: {message.clean_content}')
+
 async def output_message(message: discord.Message):
     output = '['
     if cfg.current_guild_id is None:
@@ -54,6 +61,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if listen_all() or listen_guild(message) or listen_channel(message):
+    if direct_message(message):
+        await output_direct_message(message)
+        await message.ack()
+    elif listen_all() or listen_guild(message) or listen_channel(message):
         await output_message(message)
         await message.ack()
