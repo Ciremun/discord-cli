@@ -9,6 +9,7 @@ import src.commands as c
 
 qthread = QueueThread('commands', daemon=True)
 
+
 def read_input():
     logger.info('type commands or messages here')
     while True:
@@ -26,7 +27,9 @@ def read_input():
             if channel is None:
                 logger.info('error: no current channel')
                 continue
-            asyncio.run_coroutine_threadsafe(channel.send(input_str), client.loop)
+            asyncio.run_coroutine_threadsafe(
+                channel.send(input_str), client.loop)
+
 
 input_thread = Thread(target=read_input)
 input_thread.daemon = True

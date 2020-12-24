@@ -10,6 +10,7 @@ from .log import logger
 
 commands_map = {}
 
+
 def command(*, name: str):
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -24,6 +25,7 @@ def command(*, name: str):
         commands_map[name] = wrapper
         return wrapper
     return decorator
+
 
 @command(name='listen')
 def listen_command(message: Message):
@@ -53,7 +55,8 @@ def listen_command(message: Message):
             if channel is not None:
                 setattr(cfg, 'current_guild_id', channel.guild.id)
                 setattr(cfg, 'current_channel_id', channel.id)
-                logger.info(f'info: now listening to: {channel.guild.name}#{channel.name}')
+                logger.info(
+                    f'info: now listening to: {channel.guild.name}#{channel.name}')
             else:
                 logger.error(f'error: channel_id not found: {channel_id}')
         else:
@@ -84,9 +87,11 @@ def listen_command(message: Message):
                 for channel in guild.channels:
                     if channel.name == channel_name:
                         setattr(cfg, 'current_channel_id', channel.id)
-                        logger.info(f'info: now listening to: {guild.name}#{channel_name}')
+                        logger.info(
+                            f'info: now listening to: {guild.name}#{channel_name}')
                         if channel.guild.id != guild.id:
-                            logger.warning(f'warning: #{channel_name} is not a child of {guild.name}')
+                            logger.warning(
+                                f'warning: #{channel_name} is not a child of {guild.name}')
                         break
                     elif channel_name in channel.name:
                         maybe_channel.append(channel.name)
@@ -103,11 +108,13 @@ def listen_command(message: Message):
         message = f'error: guild "{find_guild}" not found'
         on_name_not_found(message, maybe_guild)
 
+
 @command(name='all')
 def all_command(message: Message):
     setattr(cfg, 'current_guild_id', None)
     setattr(cfg, 'current_channel_id', None)
     logger.info(f'info: now listening to: all')
+
 
 def on_name_not_found(message: str, similar_names: List[str]):
     logger.error(message)

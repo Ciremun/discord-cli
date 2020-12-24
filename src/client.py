@@ -1,4 +1,6 @@
 import re
+import textwrap
+import shutil
 
 import discord
 
@@ -10,35 +12,54 @@ client = discord.Client()
 discord_emote_re = re.compile(r'<:(\w+|\d+):(\d{18})>')
 
 if cfg.chat_log:
-    print_chat_message = logger.info
+    print_func = logger.info
 else:
-    print_chat_message = print
+    print_func = print
+
 
 def listen_all() -> bool:
     return cfg.current_guild_id is None
 
+
 def listen_guild(message: discord.Message) -> bool:
     return cfg.current_guild_id == message.guild.id and cfg.current_channel_id is None
+
 
 def listen_channel(message: discord.Message) -> bool:
     return cfg.current_guild_id == message.guild.id and cfg.current_channel_id == message.channel.id
 
+
 def fix_discord_emotes(message: str) -> str:
     return re.sub(discord_emote_re, r'\1', message)
+
 
 def direct_message(message: discord.Message) -> bool:
     return isinstance(message.channel, discord.DMChannel)
 
+
+def term_col() -> int:
+    return shutil.get_terminal_size().columns
+
+
+def print_chat_message(message: str):
+    message = textwrap.fill(message, term_col())
+    print_func(message)
+
+
 async def output_direct_message(message: discord.Message):
     message.content = fix_discord_emotes(message.content)
-    print_chat_message(f'[*PM] {message.author.display_name}: {message.clean_content}')
+    print_chat_message(
+        f'[*PM] {message.author.display_name}: {message.clean_content}')
+
 
 async def output_message(message: discord.Message):
     output = '['
     if cfg.current_guild_id is None:
         output += message.guild.name
     message.content = fix_discord_emotes(message.content)
-    print_chat_message(f'{output}#{message.channel.name}] {message.author.display_name}: {message.clean_content}')
+    print_chat_message(
+        f'{output}#{message.channel.name}] {message.author.display_name}: {message.clean_content}')
+
 
 @client.event
 async def on_ready():
@@ -58,6 +79,7 @@ async def on_ready():
     else:
         channel = ''
     logger.info(f'listening to: {guild}{channel}')
+
 
 @client.event
 async def on_message(message):

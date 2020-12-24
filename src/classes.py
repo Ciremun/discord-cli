@@ -1,6 +1,7 @@
 from queue import Queue
 from threading import Thread
 
+
 class Message:
 
     def __init__(self, message: str):
@@ -9,6 +10,7 @@ class Message:
 
     def __str__(self):
         return self.content
+
 
 class QueueThread(Thread):
 

@@ -17,20 +17,27 @@ streamHandler = logging.StreamHandler(sys.stdout)
 streamHandler.setFormatter(streamHandlerFormatter)
 logger.addHandler(streamHandler)
 
-fileHandlerFormatter = logging.Formatter('[%(asctime)s] %(levelname)s:%(message)s')
-fileHandler = RotatingFileHandler('log/latest.log', mode='a', maxBytes=5242880, backupCount=2, encoding='utf-8')
+fileHandlerFormatter = logging.Formatter(
+    '[%(asctime)s] %(levelname)s:%(message)s')
+fileHandler = RotatingFileHandler(
+    'log/latest.log', mode='a', maxBytes=5242880, backupCount=2, encoding='utf-8')
 fileHandler.setFormatter(fileHandlerFormatter)
 logger.addHandler(fileHandler)
 
+
 def printLogException(etype, value, tb):
-    formatted_exception = ' '.join(traceback.format_exception(etype, value, tb))
+    formatted_exception = ' '.join(
+        traceback.format_exception(etype, value, tb))
     logger.critical(f"Uncaught exception: {formatted_exception}")
+
 
 def threadingExceptionHandler(e: ExceptHookArgs):
     printLogException(e.exc_type, e.exc_value, e.exc_traceback)
 
+
 def sysExceptionHandler(*args):
     printLogException(*args)
+
 
 sys.excepthook = sysExceptionHandler
 threading.excepthook = threadingExceptionHandler
