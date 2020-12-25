@@ -9,7 +9,7 @@ from .log import logger
 
 client = discord.Client()
 
-discord_emote_re = re.compile(r'<:(\w+|\d+):(\d{18})>')
+discord_emote_re = re.compile(r'<a?:(\w+|\d+):(\d{18})>')
 
 if cfg.chat_log:
     print_func = logger.info
