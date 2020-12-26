@@ -34,7 +34,7 @@ def fix_discord_emotes(message: str) -> str:
 
 
 def direct_message(message: discord.Message) -> bool:
-    return isinstance(message.channel, discord.DMChannel)
+    return any(isinstance(message.channel, x) for x in [discord.DMChannel, discord.GroupChannel])
 
 
 def term_col() -> int:
@@ -48,8 +48,13 @@ def print_chat_message(message: str):
 
 async def output_direct_message(message: discord.Message):
     message.content = fix_discord_emotes(message.content)
+    channel = ''
+    if isinstance(message.channel, discord.DMChannel):
+        channel += 'PM'
+    else:
+        channel += message.channel.name or ', '.join(x.display_name for x in message.channel.recipients)
     print_chat_message(
-        f'[*PM] {message.author.display_name}: {message.clean_content}')
+        f'[*{channel}] {message.author.display_name}: {message.clean_content}')
 
 
 async def output_message(message: discord.Message):
