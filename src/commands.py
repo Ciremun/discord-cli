@@ -11,7 +11,7 @@ from .log import logger
 commands_map = {}
 
 
-def command(*, name: str):
+def command(*, name: str, aliases = []):
     def decorator(func):
         def wrapper(*args, **kwargs):
             if not client.is_ready():
@@ -22,12 +22,13 @@ def command(*, name: str):
             except Exception as e:
                 logger.exception(e)
         wrapper.__name__ = name
-        commands_map[name] = wrapper
+        for s in [name] + aliases:
+            commands_map[s] = wrapper
         return wrapper
     return decorator
 
 
-@command(name='listen')
+@command(name='listen', aliases=['l'])
 def listen_command(message: Message):
     find_guild = message.parts[1:]
     if not find_guild:
