@@ -45,13 +45,16 @@ def print_chat_message(message: str):
     message = textwrap.fill(message, term_col())
     print_func(message)
 
+def message_attachments(message: discord.Message):
+    return '\n' + '\n'.join(a.url for a in message.attachments) if message.attachments else ""
 
 async def output_direct_message(message: discord.Message):
     message.content = fix_discord_emotes(message.content)
     channel = 'PM' if isinstance(message.channel, discord.DMChannel) else message.channel.name or ', '.join(x.display_name for x in message.channel.recipients)
     output = '[*Incoming Call]' if message.type == discord.MessageType.call else message.clean_content
+    attachments = message_attachments(message)
     print_chat_message(
-        f'[*{channel}] {message.author.display_name}: {output}')
+        f'[*{channel}] {message.author.display_name}: {output}{attachments}')
 
 
 async def output_message(message: discord.Message):
@@ -59,8 +62,9 @@ async def output_message(message: discord.Message):
     if cfg.current_guild_id is None:
         output += message.guild.name
     message.content = fix_discord_emotes(message.content)
+    attachments = message_attachments(message)
     print_chat_message(
-        f'{output}#{message.channel.name}] {message.author.display_name}: {message.clean_content}')
+        f'{output}#{message.channel.name}] {message.author.display_name}: {message.clean_content}{attachments}')
 
 
 @client.event
