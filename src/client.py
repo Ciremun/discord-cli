@@ -48,13 +48,10 @@ def print_chat_message(message: str):
 
 async def output_direct_message(message: discord.Message):
     message.content = fix_discord_emotes(message.content)
-    channel = ''
-    if isinstance(message.channel, discord.DMChannel):
-        channel += 'PM'
-    else:
-        channel += message.channel.name or ', '.join(x.display_name for x in message.channel.recipients)
+    channel = 'PM' if isinstance(message.channel, discord.DMChannel) else message.channel.name or ', '.join(x.display_name for x in message.channel.recipients)
+    output = '[*Incoming Call]' if message.type == discord.MessageType.call else message.clean_content
     print_chat_message(
-        f'[*{channel}] {message.author.display_name}: {message.clean_content}')
+        f'[*{channel}] {message.author.display_name}: {output}')
 
 
 async def output_message(message: discord.Message):
