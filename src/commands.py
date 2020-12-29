@@ -23,8 +23,10 @@ def command(*, name: str, aliases=[]):
                 return func(*args, **kwargs)
             except Exception as e:
                 logger.exception(e)
-        wrapper.__name__ = name
+        wrapper.__name__ = func.__name__
         for s in [name] + aliases:
+            if commands_map.get(s) is not None:
+                logger.warning(f'warning: command {s} ({wrapper.__name__}) already exists')
             commands_map[s] = wrapper
         return wrapper
     return decorator
