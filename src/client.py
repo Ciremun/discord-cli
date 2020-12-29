@@ -45,12 +45,15 @@ def print_chat_message(message: str):
     message = textwrap.fill(message, term_col())
     print_func(message)
 
+
 def message_attachments(message: discord.Message):
     return '\n' + '\n'.join(a.url for a in message.attachments) if message.attachments else ""
 
+
 async def output_direct_message(message: discord.Message):
     message.content = fix_discord_emotes(message.content)
-    channel = 'PM' if isinstance(message.channel, discord.DMChannel) else message.channel.name or ', '.join(x.display_name for x in message.channel.recipients)
+    channel = 'PM' if isinstance(message.channel, discord.DMChannel) else message.channel.name or ', '.join(
+        x.display_name for x in message.channel.recipients)
     output = '[*Incoming Call]' if message.type == discord.MessageType.call else message.clean_content
     attachments = message_attachments(message)
     print_chat_message(
@@ -77,7 +80,7 @@ async def on_ready():
         if guild:
             guild = guild.name
         else:
-            logger.error(f'error: guild "{cfg.current_guild_id}" not found')
+            logger.info(f'error: guild "{cfg.current_guild_id}" not found')
             return
     channel = client.get_channel(cfg.current_channel_id)
     if channel:
