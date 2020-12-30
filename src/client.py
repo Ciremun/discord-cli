@@ -2,12 +2,12 @@ import re
 import textwrap
 import shutil
 
-import discord
+from discord import Client, Message, DMChannel, GroupChannel, MessageType
 
 import src.config as cfg
 from .log import logger
 
-client = discord.Client()
+client = Client()
 discord_emote_re = re.compile(r'<a?:(\w+|\d+):(\d{18})>')
 
 if cfg.chat_log:
@@ -20,11 +20,11 @@ def listen_all() -> bool:
     return cfg.current_guild_id is None
 
 
-def listen_guild(message: discord.Message) -> bool:
+def listen_guild(message: Message) -> bool:
     return cfg.current_guild_id == message.guild.id and cfg.current_channel_id is None
 
 
-def listen_channel(message: discord.Message) -> bool:
+def listen_channel(message: Message) -> bool:
     return cfg.current_guild_id == message.guild.id and cfg.current_channel_id == message.channel.id
 
 
@@ -32,8 +32,8 @@ def fix_discord_emotes(message: str) -> str:
     return re.sub(discord_emote_re, r'\1', message)
 
 
-def direct_message(message: discord.Message) -> bool:
-    return any(isinstance(message.channel, x) for x in [discord.DMChannel, discord.GroupChannel])
+def direct_message(message: Message) -> bool:
+    return any(isinstance(message.channel, x) for x in [DMChannel, GroupChannel])
 
 
 def term_col() -> int:
@@ -45,21 +45,21 @@ def print_chat_message(message: str):
     print_func(message)
 
 
-def message_attachments(message: discord.Message):
+def message_attachments(message: Message):
     return '\n' + '\n'.join(a.url for a in message.attachments) if message.attachments else ""
 
 
-async def output_direct_message(message: discord.Message):
-    message.content = fix_discord_emotes(message.content)
-    channel = 'PM' if isinstance(message.channel, discord.DMChannel) else message.channel.name or ', '.join(
+async def output_direct_message(message: Message):
+    channel = 'PM' if isinstance(message.channel, DMChannel) else message.channel.name or ', '.join(
         x.display_name for x in message.channel.recipients)
-    output = '[*Incoming Call]' if message.type == discord.MessageType.call else message.clean_content
+    output = '[*Incoming Call]' if message.type == MessageType.call else message.clean_content
+    message.content = fix_discord_emotes(message.content)
     attachments = message_attachments(message)
     print_chat_message(
         f'[*{channel}] {message.author.display_name}: {output}{attachments}')
 
 
-async def output_message(message: discord.Message):
+async def output_message(message: Message):
     output = '['
     if cfg.current_guild_id is None:
         output += message.guild.name
