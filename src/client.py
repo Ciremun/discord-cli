@@ -50,7 +50,7 @@ def message_attachments(message: Message):
 
 
 async def output_direct_message(message: Message):
-    channel = 'PM' if isinstance(message.channel, DMChannel) else message.channel.name or ', '.join(
+    channel = message.channel.recipient if isinstance(message.channel, DMChannel) else message.channel.name or ', '.join(
         x.display_name for x in message.channel.recipients)
     output = '[*Incoming Call]' if message.type == MessageType.call else message.clean_content
     message.content = fix_discord_emotes(message.content)
