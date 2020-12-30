@@ -48,7 +48,8 @@ def gen_command_find_guild_channel(cmd_args: list[str], **functions):
 
 
 async def fetch_print_messages(channel: TextChannel, limit: int):
-    async for m in channel.history(limit=limit):
+    history = await channel.history(limit=limit).flatten()
+    for m in reversed(history):
         m.content = fix_discord_emotes(m.content)
         attachments = message_attachments(m)
         print_chat_message(
