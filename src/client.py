@@ -8,7 +8,6 @@ import src.config as cfg
 from .log import logger
 
 client = discord.Client()
-
 discord_emote_re = re.compile(r'<a?:(\w+|\d+):(\d{18})>')
 
 if cfg.chat_log:
@@ -38,7 +37,7 @@ def direct_message(message: discord.Message) -> bool:
 
 
 def term_col() -> int:
-    return shutil.get_terminal_size().columns
+    return shutil.get_terminal_size().columns - 1
 
 
 def print_chat_message(message: str):

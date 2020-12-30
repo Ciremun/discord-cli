@@ -35,9 +35,5 @@ def threadingExceptionHandler(e: ExceptHookArgs):
     printLogException(e.exc_type, e.exc_value, e.exc_traceback)
 
 
-def sysExceptionHandler(*args):
-    printLogException(*args)
-
-
-sys.excepthook = sysExceptionHandler
+sys.excepthook = printLogException
 threading.excepthook = threadingExceptionHandler
