@@ -45,28 +45,43 @@ def print_chat_message(message: str):
     print_func(message)
 
 
+def fix_message(message: Message):
+    message.content = fix_discord_emotes(message.content)
+    message.content = message_attachments(message)
+    # message.content = message_references(message)
+    return message
+
+
 def message_attachments(message: Message):
-    return '\n' + '\n'.join(a.url for a in message.attachments) if message.attachments else ""
+    return message.content + '\n' + '\n'.join(a.url for a in message.attachments) if message.attachments else message.content
+
+
+# def message_references(message: Message):
+#     if ref := message.reference:
+#         if reply := ref.resolved:
+#             return f'@{reply.author.display_name} {message.content}'
+#     return message.content
 
 
 async def output_direct_message(message: Message):
     channel = message.channel.recipient if isinstance(message.channel, DMChannel) else message.channel.name or ', '.join(
         x.display_name for x in message.channel.recipients)
-    output = '[*Incoming Call]' if message.type == MessageType.call else message.clean_content
-    message.content = fix_discord_emotes(message.content)
-    attachments = message_attachments(message)
+    if message.type == MessageType.call:
+        output = '[*Call]'
+    else:
+        message = fix_message(message)
+        output = message.clean_content
     print_chat_message(
-        f'[*{channel}] {message.author.display_name}: {output}{attachments}')
+        f'[*{channel}] {message.author.display_name}: {output}')
 
 
 async def output_message(message: Message):
     output = '['
     if cfg.current_guild_id is None:
         output += message.guild.name
-    message.content = fix_discord_emotes(message.content)
-    attachments = message_attachments(message)
+    message = fix_message(message)
     print_chat_message(
-        f'{output}#{message.channel.name}] {message.author.display_name}: {message.clean_content}{attachments}')
+        f'{output}#{message.channel.name}] {message.author.display_name}: {message.clean_content}')
 
 
 @client.event
@@ -89,7 +104,7 @@ async def on_ready():
     logger.info(f'listening to: {guild}{channel}')
 
 
-@client.event
+@ client.event
 async def on_message(message):
     if direct_message(message):
         await output_direct_message(message)

@@ -4,7 +4,7 @@ from typing import Iterable, Callable
 from discord import TextChannel
 from discord.utils import find
 
-from .client import client, print_chat_message, fix_discord_emotes, message_attachments
+from .client import client, print_chat_message, fix_message
 from .log import logger
 
 listen_re = re.compile(r'^([^#]{1,100})?#?([\w-]{1,100})?$')
@@ -50,7 +50,6 @@ def gen_command_find_guild_channel(cmd_args: list[str], **functions):
 async def fetch_print_messages(channel: TextChannel, limit: int):
     history = await channel.history(limit=limit).flatten()
     for m in reversed(history):
-        m.content = fix_discord_emotes(m.content)
-        attachments = message_attachments(m)
+        m = fix_message(m)
         print_chat_message(
-            f'[{m.guild.name}#{m.channel.name}] {m.author.display_name}: {m.clean_content}{attachments}')
+            f'[{m.guild.name}#{m.channel.name}] {m.author.display_name}: {m.clean_content}')
