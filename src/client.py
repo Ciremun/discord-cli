@@ -37,7 +37,7 @@ def direct_message(message: Message) -> bool:
 
 
 def term_col() -> int:
-    return shutil.get_terminal_size().columns - 1
+    return shutil.get_terminal_size().columns
 
 
 def print_chat_message(message: str):
@@ -48,7 +48,7 @@ def print_chat_message(message: str):
 def fix_message(message: Message):
     message.content = fix_discord_emotes(message.content)
     message.content = message_attachments(message)
-    # message.content = message_references(message)
+    message.content = message_references(message)
     return message
 
 
@@ -56,11 +56,12 @@ def message_attachments(message: Message):
     return message.content + '\n' + '\n'.join(a.url for a in message.attachments) if message.attachments else message.content
 
 
-# def message_references(message: Message):
-#     if ref := message.reference:
-#         if reply := ref.resolved:
-#             return f'@{reply.author.display_name} {message.content}'
-#     return message.content
+def message_references(message: Message):
+    if ref := message.reference:
+        if reply := ref.resolved:
+            if isinstance(reply, Message):
+                return f'@{reply.author.display_name} {message.content}'
+    return message.content
 
 
 async def output_direct_message(message: Message):
@@ -104,7 +105,7 @@ async def on_ready():
     logger.info(f'listening to: {guild}{channel}')
 
 
-@ client.event
+@client.event
 async def on_message(message):
     if direct_message(message):
         await output_direct_message(message)
