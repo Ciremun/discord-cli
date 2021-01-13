@@ -40,6 +40,8 @@ def listen_command(message: Message):
         guild = guild.name if guild else ""
         channel = client.get_channel(cfg.current_channel_id)
         channel = f'#{channel.name}' if channel else ""
+        if not guild and not channel:
+            guild = "all"
         logger.info(f'info: listening to: {guild}{channel}')
         return
 
