@@ -53,3 +53,4 @@ async def fetch_print_messages(channel: TextChannel, limit: int):
         m = fix_message(m)
         print_chat_message(
             f'[{m.guild.name}#{m.channel.name}] {m.author.display_name}: {m.clean_content}')
+        client.loop.create_task(m.ack())
