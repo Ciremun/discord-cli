@@ -109,7 +109,5 @@ async def on_ready():
 async def on_message(message):
     if direct_message(message):
         output_direct_message(message)
-        client.loop.create_task(message.ack())
     elif listen_all() or listen_guild(message) or listen_channel(message):
         output_message(message)
-        client.loop.create_task(message.ack())
