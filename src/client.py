@@ -2,7 +2,15 @@ import re
 import textwrap
 import shutil
 
-from discord import Client, Message, DMChannel, GroupChannel, MessageType
+from discord import (
+    Client,
+    Message,
+    DMChannel,
+    GroupChannel,
+    MessageType,
+    Member,
+    VoiceState
+)
 
 import src.config as cfg
 from .log import logger
@@ -85,6 +93,21 @@ def output_message(message: Message):
         f'{output}#{message.channel.name}] {message.author.display_name}: {message.clean_content}')
 
 
+def output_voice_state(member: Member,
+                       before: VoiceState,
+                       after: VoiceState):
+    guild = member.guild.name if cfg.current_guild_id is None else client.get_guild(cfg.current_guild_id).name
+    status = None
+    voice_channel_name = None
+    if not before.channel and after.channel:
+        status = f'joined'
+        voice_channel_name = after.channel.name
+    elif before.channel and not after.channel:
+        status = f'left'
+        voice_channel_name = before.channel.name
+    print_chat_message(f'[{guild}#{voice_channel_name}] {member.display_name} has {status} voice')
+
+
 @client.event
 async def on_ready():
     logger.info(f'logged on as {client.user}')
@@ -111,3 +134,11 @@ async def on_message(message):
         output_direct_message(message)
     elif listen_all() or listen_guild(message) or listen_channel(message):
         output_message(message)
+
+
+@client.event
+async def on_voice_state_update(member: Member,
+                                before: VoiceState,
+                                after: VoiceState):
+    if listen_all() or cfg.current_guild_id == member.guild.id:
+        output_voice_state(member, before, after)
