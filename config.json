@@ -2,6 +2,5 @@
     "prefix": "!",
     "current_guild_id": 542264318465671168,
     "current_channel_id": null,
-    "chat_log": false,
-    "bot": false
+    "chat_log": false
 }

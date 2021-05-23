@@ -5,4 +5,6 @@ import src.commands
 
 if __name__ == '__main__':
     input_thread.start()
-    client.run(cfg.token, bot=cfg.bot)
+
+    # discord is becoming worse sadge
+    client.run(cfg.token, bot=True)
